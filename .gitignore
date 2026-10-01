@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+!.env.pilot.example
+data/
+__pycache__/
+*.log
+.DS_Store
+
+.venv*/
+backups/
+output/*
+!output/pdf/
+!output/pdf/*.pdf
+!output/presentation/
+!output/presentation/*.pptx
+bot-info.json

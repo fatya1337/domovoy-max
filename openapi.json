@@ -1,0 +1,2113 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Домовой HTTP API",
+    "version": "0.3.0",
+    "description": "Рабочий прототип одной УК и отдельного учебного диспетчера. Нет внешнего подключения 112. Публичный постоянный адрес ещё не назначен."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8765",
+      "description": "Только локальное демо; для MAX заменить фактическим PUBLIC_ORIGIN"
+    }
+  ],
+  "security": [
+    {
+      "MaxInitData": []
+    },
+    {
+      "DemoProfile": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Проверка процесса",
+        "description": "",
+        "operationId": "get_health",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/config": {
+      "get": {
+        "summary": "Режим приложения",
+        "description": "",
+        "operationId": "get_api_config",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "demo",
+                        "max"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/state": {
+      "get": {
+        "summary": "Доступный подъезд и общая лента",
+        "description": "Житель: только свои подъезды. УК: все дома экземпляра. Приватные обращения отсутствуют в ответе. Лимиты: 100 сообщений, 30 объявлений, 50 заявок, 30 аварий.",
+        "operationId": "get_api_state",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/State"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "entrance_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/ticket": {
+      "get": {
+        "summary": "Карточка бытовой заявки",
+        "description": "",
+        "operationId": "get_api_ticket",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/queue": {
+      "get": {
+        "summary": "Очередь УК",
+        "description": "Только ADMIN_IDS; до 100 незакрытых заявок. Счётчики по всей базе.",
+        "operationId": "get_api_queue",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Queue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidents": {
+      "get": {
+        "summary": "Приватные учебные обращения",
+        "description": "Только автор или DISPATCHER_IDS. В MAX требуется TRAINING_INCIDENTS_ENABLED=1. До 50 карточек; счётчики по всем доступным. УК не получает право чтения чужих обращений.",
+        "operationId": "get_api_incidents",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Создать учебное обращение",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_incidents",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "incident_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "incident_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 240
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  },
+                  "training_ack": {
+                    "const": true
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "address",
+                  "description",
+                  "training_ack"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/houses": {
+      "post": {
+        "summary": "Создать дом",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_houses",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entrance_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "entrance_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 80
+                  },
+                  "address": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 160
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "name",
+                  "address",
+                  "count"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/join": {
+      "post": {
+        "summary": "Вступить по приглашению",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_join",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entrance_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "entrance_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 40
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/invite/rotate": {
+      "post": {
+        "summary": "Заменить приглашение",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_invite_rotate",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "minLength": 0,
+                      "maxLength": 2000
+                    },
+                    "entrance_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "entrance_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages": {
+      "post": {
+        "summary": "Сообщение соседям",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_messages",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "text"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tickets": {
+      "post": {
+        "summary": "Создать бытовую заявку",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_tickets",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "ticket_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "ticket_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 300
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "light",
+                      "water",
+                      "clean",
+                      "lift",
+                      "door",
+                      "other"
+                    ]
+                  },
+                  "details": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 2000
+                  },
+                  "outage_id": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 1
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "title"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ticket/outage": {
+      "post": {
+        "summary": "Связать заявку с аварией",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_ticket_outage",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "outage_id": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 1
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "id",
+                  "outage_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ticket/comment": {
+      "post": {
+        "summary": "Комментарий к бытовой заявке",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_ticket_comment",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1500
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "id",
+                  "text"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status": {
+      "post": {
+        "summary": "Изменить статус бытовой заявки",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_status",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "new",
+                      "work",
+                      "done",
+                      "confirmed"
+                    ]
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 1500
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "id",
+                  "status"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notices": {
+      "post": {
+        "summary": "Объявление УК",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_notices",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "entrances": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "entrances"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 100
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "entrance",
+                      "house"
+                    ]
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "title",
+                  "text"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notice/read": {
+      "post": {
+        "summary": "Подтвердить ознакомление",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_notice_read",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entrance_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "entrance_id",
+                  "id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/outages": {
+      "post": {
+        "summary": "Общая авария домов",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_outages",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "outage_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "outage_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "house_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "water",
+                      "power",
+                      "heating",
+                      "other"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 120
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1000
+                  },
+                  "forecast": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 120
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "house_ids",
+                  "service",
+                  "title",
+                  "reason"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/outages/update": {
+      "post": {
+        "summary": "Обновить аварию",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_outages_update",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "outage_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "outage_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "reported",
+                      "work",
+                      "restored"
+                    ]
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1000
+                  },
+                  "forecast": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 120
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "id",
+                  "version",
+                  "status",
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidents/update": {
+      "post": {
+        "summary": "Учебный статус диспетчера",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_incidents_update",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "incident_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "incident_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "review",
+                      "clarify",
+                      "closed"
+                    ]
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "id",
+                  "version",
+                  "status",
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/incidents/comment": {
+      "post": {
+        "summary": "Приватное уточнение",
+        "description": "В MAX обязателен Origin, равный PUBLIC_ORIGIN, и валидный X-Max-Init-Data. Content-Type строго application/json. Права и переходы проверяются сервером; описание в API.md.",
+        "operationId": "post_api_incidents_comment",
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "incident_id": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "incident_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные, устаревшая версия или конфликт request_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа, неверная подпись, Host или Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "request_id": {
+                    "type": "string",
+                    "minLength": 16,
+                    "maxLength": 80,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "description": "Один идентификатор на логическую операцию; повтор с другим телом отклоняется"
+                  }
+                },
+                "required": [
+                  "id",
+                  "version",
+                  "note"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhook": {
+      "post": {
+        "summary": "Приём событий MAX (альтернатива Long Polling)",
+        "operationId": "post_webhook",
+        "security": [
+          {
+            "MaxWebhookSecret": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "update_type"
+                ],
+                "properties": {
+                  "update_type": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "OK": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "const": true
+          }
+        },
+        "required": [
+          "ok"
+        ]
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "name": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "resident",
+              "manager",
+              "dispatcher"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "label"
+        ]
+      },
+      "Entrance": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "house_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "address": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "code": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "house_id",
+          "number",
+          "name",
+          "address"
+        ]
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "entrance_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "author": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "title": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "work",
+              "done",
+              "confirmed"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "details": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "created": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "entrance_id",
+          "author",
+          "title",
+          "status",
+          "category",
+          "details",
+          "created"
+        ]
+      },
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "address": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "description": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "saved",
+              "review",
+              "clarify",
+              "closed"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "updated": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 2000
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "saved",
+                    "review",
+                    "clarify",
+                    "closed"
+                  ]
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 2000
+                },
+                "created": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 2000
+                },
+                "actor": {
+                  "type": "string",
+                  "enum": [
+                    "Заявитель",
+                    "Учебный диспетчер"
+                  ]
+                }
+              },
+              "required": [
+                "status",
+                "note",
+                "created",
+                "actor"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "description",
+          "status",
+          "version",
+          "created",
+          "updated",
+          "events"
+        ]
+      },
+      "IncidentList": {
+        "type": "object",
+        "properties": {
+          "dispatcher": {
+            "type": "boolean"
+          },
+          "incidents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            }
+          },
+          "counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "required": [
+          "dispatcher",
+          "incidents",
+          "counts"
+        ]
+      },
+      "State": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Profile"
+            }
+          },
+          "entrances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entrance"
+            }
+          },
+          "selected": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "demo": {
+            "type": "boolean"
+          },
+          "training_incidents": {
+            "type": "boolean"
+          },
+          "dispatcher": {
+            "type": "boolean"
+          },
+          "outages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "notices": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ticket"
+            }
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Profile"
+            }
+          },
+          "stats": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "profile",
+          "entrances",
+          "selected",
+          "demo",
+          "training_incidents",
+          "dispatcher",
+          "outages",
+          "messages",
+          "notices",
+          "tickets",
+          "members",
+          "stats"
+        ]
+      },
+      "TicketDetail": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "$ref": "#/components/schemas/Ticket"
+          },
+          "outage": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Profile"
+            }
+          }
+        },
+        "required": [
+          "ticket",
+          "events",
+          "profiles"
+        ]
+      },
+      "Queue": {
+        "type": "object",
+        "properties": {
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ticket"
+            }
+          },
+          "counts": {
+            "type": "object"
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Profile"
+            }
+          }
+        },
+        "required": [
+          "tickets",
+          "counts",
+          "profiles"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "MaxInitData": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Max-Init-Data",
+        "description": "Подписанный MAX initData, срок 1 час. Серверная проверка HMAC; роли из окружения сервера."
+      },
+      "DemoProfile": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Demo-Profile",
+        "description": "Только APP_MODE=demo: anna, boris, manager, dispatcher. В MAX этот заголовок не даёт доступ."
+      },
+      "MaxWebhookSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Max-Bot-Api-Secret"
+      }
+    }
+  }
+}

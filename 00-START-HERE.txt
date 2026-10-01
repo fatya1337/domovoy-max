@@ -1,0 +1,10 @@
+ДОМОВОЙ / salfetka5
+
+1. Presentation/domovoy-salfetka5.pdf — презентация решения.
+2. Presentation/domovoy-salfetka5.pptx — редактируемая копия.
+3. smart-city-bot/REVIEWER-GUIDE.md — инструкция проверки.
+4. smart-city-bot/ — исходники, тесты и документация.
+5. SOURCE-REVISION.txt — зафиксированная ревизия исходников.
+
+Бот: https://max.ru/t738_hakaton_max_bot
+Миниаппа: https://domovoy-doma.ru/ (открывать кнопкой в MAX)

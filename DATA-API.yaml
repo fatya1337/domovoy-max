@@ -1,0 +1,82 @@
+schema_version: "domovoy-team-1.0"
+solution: "Домовой"
+status: "deployed-awaiting-dns-and-max-verification"
+# Team-defined schema based on the required fields in the case PDF, not a claimed organizer schema.
+base_url: "https://domovoy-doma.ru"
+local_demo_base_url: "http://127.0.0.1:8765"
+openapi: "openapi.json"
+fixtures: "fixtures/scenario.json"
+notes:
+  - "Перед сдачей повторить внешнюю HTTPS-проверку после обновления DNS и проверить доступ внутри MAX."
+  - "Рабочие токены не включены. MAX initData выдаёт платформа, а не этот файл."
+  - "Локальные профили доступны только в APP_MODE=demo; не являются учётными записями MAX."
+roles:
+  resident:
+    local_header: {X-Demo-Profile: anna}
+    max_header: {X-Max-Init-Data: "${RESIDENT_INIT_DATA}"}
+  manager:
+    local_header: {X-Demo-Profile: manager}
+    max_header: {X-Max-Init-Data: "${MANAGER_INIT_DATA}"}
+  dispatcher:
+    local_header: {X-Demo-Profile: dispatcher}
+    max_header: {X-Max-Init-Data: "${DISPATCHER_INIT_DATA}"}
+    prerequisite: "TRAINING_INCIDENTS_ENABLED=1 and user ID in DISPATCHER_IDS"
+checks:
+  - id: health
+    method: GET
+    path: /health
+    role: public
+    query: {}
+    headers: {}
+    expected_status: [200]
+    response: {content_type: application/json, required: [ok], equals: {ok: true}}
+  - id: state
+    method: GET
+    path: /api/state
+    role: resident
+    query: {}
+    headers: {X-Max-Init-Data: "${RESIDENT_INIT_DATA}"}
+    expected_status: [200]
+    response: {content_type: application/json, required: [profile, entrances, tickets, outages]}
+  - id: create_ticket
+    method: POST
+    path: /api/tickets
+    role: resident
+    query: {}
+    headers: {Origin: "${PUBLIC_ORIGIN}", Content-Type: application/json, X-Max-Init-Data: "${RESIDENT_INIT_DATA}"}
+    body: {entrance_id: "${ENTRANCE_ID}", title: "Лампа на третьем этаже не горит", category: light, request_id: "${REQUEST_ID}"}
+    expected_status: [200]
+    response: {content_type: application/json, required: [ok, ticket_id]}
+  - id: manager_queue
+    method: GET
+    path: /api/queue
+    role: manager
+    query: {}
+    headers: {X-Max-Init-Data: "${MANAGER_INIT_DATA}"}
+    expected_status: [200]
+    response: {content_type: application/json, required: [tickets, counts, profiles]}
+  - id: mark_work
+    method: POST
+    path: /api/status
+    role: manager
+    query: {}
+    headers: {Origin: "${PUBLIC_ORIGIN}", Content-Type: application/json, X-Max-Init-Data: "${MANAGER_INIT_DATA}"}
+    body: {entrance_id: "${ENTRANCE_ID}", id: "${TICKET_ID}", status: work, request_id: "${REQUEST_ID}"}
+    expected_status: [200]
+    response: {content_type: application/json, required: [ok]}
+  - id: private_training_queue
+    method: GET
+    path: /api/incidents
+    role: dispatcher
+    query: {}
+    headers: {X-Max-Init-Data: "${DISPATCHER_INIT_DATA}"}
+    expected_status: [200]
+    response: {content_type: application/json, required: [dispatcher, incidents, counts]}
+  - id: resident_cannot_view_manager_queue
+    method: GET
+    path: /api/queue
+    role: resident
+    query: {}
+    headers: {X-Max-Init-Data: "${RESIDENT_INIT_DATA}"}
+    expected_status: [403]
+    response: {content_type: application/json, required: [error]}

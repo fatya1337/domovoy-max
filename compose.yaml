@@ -1,0 +1,16 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  bot:
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    logging: *default-logging
+    volumes:
+      - bot-data:/app/data
+volumes:
+  bot-data:
