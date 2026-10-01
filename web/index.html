@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Домовой — ваш дом, ваши соседи</title><link rel="stylesheet" href="/style.css"><script src="/request.js" defer></script><script src="/app.js" defer></script></head>
+<body class="auth-pending"><div class="demo">Домовой · подключаемся к вашему дому…</div>
+<div class="shell"><aside><a class="brand" href="/" aria-label="Домовой, главная"><span class="brand-icon">д.</span> домовой<span class="brand-dot">•</span></a><p class="tagline">Хорошо, когда дома порядок.</p>
+<label class="profile-label" for="profile">Посмотреть от лица</label><select id="profile"><option value="anna">Анна · житель</option><option value="boris">Борис · житель</option><option value="dispatcher">Илья · учебный диспетчер</option><option value="manager">Мария · УК</option></select>
+<div class="nav-label">МОЙ ДОМ</div><nav id="nav"><button data-tab="home" class="active"><span>⌂</span> Обзор</button><button data-tab="chat"><span>◌</span> Соседи</button><button data-tab="tickets"><span>▤</span> Заявки</button><button data-tab="manage" id="manageNav"><span>▦</span> Управление</button></nav>
+<div class="aside-bottom"><div><span class="online-dot"></span><span id="organization">УК «Добрый квартал»</span></div><small id="organizationHint">Демонстрационная организация</small><button class="help-link" id="emergency">Экстренная помощь · 112 ↗</button></div></aside>
+<main><header><div><div class="eyebrow" id="eyebrow">ВАШЕ МЕСТО В ГОРОДЕ</div><h1 id="heading">Мой подъезд</h1></div><div class="header-actions"><button class="emergency-short" id="emergencyMobile" aria-label="Экстренная помощь 112">Помощь · 112</button><button class="avatar" id="profileHint" aria-label="Текущий профиль">А</button></div></header>
+<div class="context"><label for="entrance">Дом и подъезд</label><select id="entrance"></select><button class="button light" id="join">＋ По приглашению</button></div>
+<button class="button light" id="incidentsNav" hidden>Приватные обращения · учебный режим</button>
+<div id="refreshNotice" class="refresh-notice" role="status" hidden><span>Изменения сохранены. Обновите экран, чтобы увидеть актуальные данные.</span><button id="refreshAll" class="button light">Обновить данные</button></div>
+<div id="content" aria-live="polite"><div class="empty">Загружаем ваш дом…</div></div>
+<footer>Домовой · Здесь начинается добрососедство<span>Обсуждения внутри приложения, не группы MAX</span></footer></main></div>
+<dialog id="modal"><form id="modalForm"><div class="modal-head"><h2 id="modalTitle"></h2><button type="button" id="closeModal" aria-label="Закрыть">×</button></div><div id="modalFields"></div><p id="formError" role="alert"></p><button class="button primary full" id="submitModal" type="submit">Сохранить</button></form></dialog><div id="toast" role="status"></div>
+</body></html>
